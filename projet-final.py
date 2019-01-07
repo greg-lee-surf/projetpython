@@ -1,63 +1,71 @@
-## projet : Multiplication modulaire
+# # projet : Multiplication modulaire
 
 from tkinter import *
-from math import sin,cos,pi
-
+from math import sin, cos, pi
+import time
 
 root = Tk()  # initialisation d'une fenetre graphique
 
-## Construction du cercle
+# # Construction du cercle
 
-canvas = Canvas(root, width = 510, height = 510) 
-canvas.grid(row=5,column=1) 
+canvas = Canvas(root, width=600, height=600) 
+canvas.grid(row=3, column=1) 
 
+Xmax = 525
+Xmin = 25
+Ymax = 525
+Ymin = 25
 
-Xmax = 505
-Xmin = 5
-Ymax = 505
-Ymin = 5
+circle = canvas.create_oval(Xmin, Ymin, Xmax, Ymax)
 
-circle = canvas.create_oval(Xmin,Ymin,Xmax,Ymax)
+# # On definit les variables necessaire a placer les points du cercle
 
-## On definit les variables necessaire a placer les points du cercle
+R = (Xmax - Xmin) / 2  # rayon du cercle
 
-R = (Xmax - Xmin)/2 # rayon du cercle
+a = (Xmax + Xmin) / 2  # milieu des abcisses
+b = (Ymax + Ymin) / 2  # milieu des ordonnees
 
-a = (Xmax + Xmin)/2 # milieu des abcisses
-b = (Ymax + Ymin)/2 # milieu des ordonnees
+# # Liste pour  remplis
 
-## points autour du cercle
+# # points autour du cercle
+n_1 = 1 
+p_1 = 1
     
-def points():
+    
+def points(modulo):
     
     """Fonction qui place les points autour du cercle."""
     
-    circle = canvas.create_oval(Xmin,Ymin,Xmax,Ymax) # re-creation du cercle
+    circle = canvas.create_oval(Xmin, Ymin, Xmax, Ymax)  # re-creation du cercle
     
     global lst_points_x
     global lst_points_y
-    p = int(case_2.get()) # le modulo
-    arc = 2*pi/p # longueur d'un arc de cercle
+    p = int(modulo)  # le modulo
+    arc = 2 * pi / p  # longueur d'un arc de cercle
     
-    lst_points_x = [] # creation d'une liste qui va contenir les coordonnees des points de Ox
-    lst_points_y = [] # creation d'une liste qui va contenir les coordonnees des points de Oy
+    lst_points_x = []  # creation d'une liste qui va contenir les coordonnees des points de Ox
+    lst_points_y = []  # creation d'une liste qui va contenir les coordonnees des points de Oy
 
     for i in range(p):
     
-        x = a + R*cos(i*arc-pi/2) 
-        y = b + R*sin(i*arc-pi/2)
+        x = a + R * cos(i * arc - pi / 2) 
+        y = b + R * sin(i * arc - pi / 2)
 
-        lst_points_x.append(x) # on ajoute x a la liste 
-        lst_points_y.append(y) # on ajoute y a la liste 
+        lst_points_x.append(x)  # on ajoute x a la liste 
+        lst_points_y.append(y)  # on ajoute y a la liste 
         
-        M = canvas.create_oval(x,y,x,y,width=0.001) # coordonnes des points tout autour du cercle
-        
+        M = canvas.create_oval(x, y, x, y, fill ='red')  # coordonnes des points tout autour du cercle
+
+        x_text = a + (R + 10) * cos(i * arc - pi / 2) 
+        y_text = b + (R + 10) * sin(i * arc - pi / 2)
+
+        canvas.create_text(x_text, y_text, text=i, fill ='red')
     return lst_points_x, lst_points_y
 
-## Traits du cercle
+# # Traits du cercle
 
 
-def traits(m,i):
+def traits(m, i):
     
     """Fonction qui va tracer les traits entre les differents points du cercle."""
     global lst_points_x
@@ -66,65 +74,92 @@ def traits(m,i):
     y_1 = lst_points_y[i]  
     x_2 = lst_points_x[m] 
     y_2 = lst_points_y[m] 
-    trait = canvas.create_line(x_1,y_1,x_2,y_2)
+    trait = canvas.create_line(x_1, y_1, x_2, y_2)
 
-def mult_mod(n,p):
+
+def mult_mod(n, p):
     
     """Fonction qui effectue le calcul de la multiplication modulaire et rejoint 
-        les differnts points."""
+        les differents points."""
     
     for i in range(p):  
-        m = n*i
+        m = n * i
         if m >= p :
             while m >= p :
-                m = m-p
-        traits(m,i) # fonction qui trace les traits
+                m = m - p
+        traits(m, i)  # fonction qui trace les traits
 
-    
+
 def modulo():
     
     """Fonction qui calcule la table de a de 0 a n modulo p. Cette fonction 
         fait appel aux fonctions 'traits' et 'points'. """
+        
+    espaces = ' ' * 55
+    Label(root, text=espaces).grid(row=0, column=2)
+    Label(root, text=espaces).grid(row=1, column=2)
     
-    canvas.delete("all") # On nettoie la fenetre
+    generation_possible = True
     
-    n = int(case_1.get()) # la table
-    p = int(case_2.get()) # le modulo
+    if re.match("([0-9 ])", case_1.get()) is None:
+       label_table_non_entier = Label(root, text="la table doit etre un entier", bg="red", fg="white")
+       label_table_non_entier.grid(row=0, column=2)
+       generation_possible = False
     
-    points() # place les points 
+    if re.match("([0-9 ])", case_2.get()) is None:
+       label_modulo_non_entier = Label(root, text="le modulo doit etre un entier", bg="red", fg="white")
+       label_modulo_non_entier.grid(row=1, column=2)
+       generation_possible = False
+       
+    if generation_possible :
+        'canvas.delete("all")'  # On nettoie la fenetre
+        n = int(case_1.get())  # la table
+        p = int(case_2.get())  # le modulo
+        global n_1 
+        global p_1 
+
+        for tab in range(n_1, n):
+            for mod in range(p_1, p):
+                canvas.delete("all")
+                points(mod)  # place les points 
+                mult_mod(tab, mod)  # rejoint les points
+                canvas.update()
+                time.sleep(0.01)
+        
+        n_1 = int(case_1.get())
+        p_1 = int(case_2.get())
+
+        return n, p
     
-    mult_mod(n,p) # rejoint les points
     
-    return n,p
+def Transition(n, p, n_1, p_1):
+    """Fonction qui permet la transition entre les differentes valeurs selectionnees. """
+    for i in range(n_1, n):
+        for j in range(p_1, p):
+            mult_mod(i, j)
     
-    
-def Transition(n,p):
-    """Fonction qui permet la transition entre les differentes valeurs selctionnees. """
-    
-    n_1 = int(case_1.get())
-    p_1 = int(case_2.get())
-    
-    d_n = abs(n_1 - n) # difference entre la table choisit et la precedente
-    d_p = abs(p_1 - p) # differrence entre le modulo choisit et le precedent
-    
-    for i in range(d_n):
-        if n <= n_1:
-            while n <= n_1:
-                n = n+i
-                mult_mod(n,p)
-    
-    
-## Creation des cases pour choisir les differentes valeurs
-texte_1 = Label(root, text="table de : ")
-texte_2 = Label(root, text="modulo : ")
+    mult_mod(n, p)
+    'mult_mod(n, j)'
+
+
+'      root.mainloop()'
+
+# # Creation des cases pour choisir les differentes valeurs
+texte_1 = Label(root, text="table de : (2)")
+texte_1.grid(row=0, column=0)
+
 case_1 = Entry(root)
+case_1.insert(END, "10")
+case_1.grid(row=0, column=1)
+
+texte_2 = Label(root, text="modulo : (6)")
+texte_2.grid(row=1, column=0)
+
 case_2 = Entry(root)
-boutton = Button(root, text="cliquez pour valider", command=modulo) #en cliquant sur ce bouton on appel la fonction trait
+case_2.insert(END, "50")
+case_2.grid(row=1, column=1)
 
+boutton = Button(root, text="cliquez pour valider", command=modulo)  # en cliquant sur ce bouton on appele la fonction trait
+boutton.grid(row=2, column=0)
 
-texte_1.grid(row=0,column=0)
-texte_2.grid(row=0,column=2)
-case_1.grid(row=0,column=1)
-case_2.grid(row=0,column=3)
-boutton.grid(row=0,column=4)
-root.mainloop() # affiche la fenetre graphique
+root.mainloop()  # affiche la fenetre graphique'
