@@ -30,7 +30,7 @@ b = (Ymax + Ymin) / 2  # milieu des ordonnees
 # # points autour du cercle
 n_1 = 1 
 p_1 = 1
-    
+
     
 def points(modulo):
     
@@ -101,62 +101,59 @@ def modulo():
     
     generation_possible = True
     
-    if re.match("([0-9 ])", case_1.get()) is None:
+    if not re.match("([0-9 ])", case_1.get()):
        label_table_non_entier = Label(root, text="la table doit etre un entier", bg="red", fg="white")
        label_table_non_entier.grid(row=0, column=2)
        generation_possible = False
     
-    if re.match("([0-9 ])", case_2.get()) is None:
+    if not re.match("([0-9 ])", case_2.get()):
        label_modulo_non_entier = Label(root, text="le modulo doit etre un entier", bg="red", fg="white")
        label_modulo_non_entier.grid(row=1, column=2)
        generation_possible = False
        
     if generation_possible :
-        'canvas.delete("all")'  # On nettoie la fenetre
         n = int(case_1.get())  # la table
-        p = int(case_2.get())  # le modulo
+        p = int(case_2.get())   # le modulo
         global n_1 
         global p_1 
-
-        for tab in range(n_1, n):
-            for mod in range(p_1, p):
+        
+        if p>=p_1 :
+            for mod in range(p_1, p + 1):
                 canvas.delete("all")
                 points(mod)  # place les points 
-                mult_mod(tab, mod)  # rejoint les points
+                mult_mod(n, mod)  # rejoint les points
                 canvas.update()
                 time.sleep(0.01)
-        
+        else: 
+            diff = p_1 - p # La difference des deux modules
+            for mod in range(1, diff+1):
+                canvas.delete("all")
+                points(p_1 -mod)  # place les points 
+                mult_mod(n, p_1 - mod)  # rejoint les points
+                canvas.update()
+                time.sleep(0.01)
+            
+    
         n_1 = int(case_1.get())
         p_1 = int(case_2.get())
 
         return n, p
-    
-    
-def Transition(n, p, n_1, p_1):
-    """Fonction qui permet la transition entre les differentes valeurs selectionnees. """
-    for i in range(n_1, n):
-        for j in range(p_1, p):
-            mult_mod(i, j)
-    
-    mult_mod(n, p)
-    'mult_mod(n, j)'
 
 
-'      root.mainloop()'
 
 # # Creation des cases pour choisir les differentes valeurs
-texte_1 = Label(root, text="table de : (2)")
+texte_1 = Label(root, text="table de : ")
 texte_1.grid(row=0, column=0)
 
 case_1 = Entry(root)
-case_1.insert(END, "10")
+case_1.insert(END, "2")
 case_1.grid(row=0, column=1)
 
-texte_2 = Label(root, text="modulo : (6)")
+texte_2 = Label(root, text="modulo : ")
 texte_2.grid(row=1, column=0)
 
 case_2 = Entry(root)
-case_2.insert(END, "50")
+case_2.insert(END, "100")
 case_2.grid(row=1, column=1)
 
 boutton = Button(root, text="cliquez pour valider", command=modulo)  # en cliquant sur ce bouton on appele la fonction trait
